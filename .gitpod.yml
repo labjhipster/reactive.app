@@ -3,4 +3,4 @@ image:
 
 tasks:
   - init: npm install && npm run build && ./mvnw install -DskipTests=false
-    command: npm run start
+    command: npm run start && mongod
