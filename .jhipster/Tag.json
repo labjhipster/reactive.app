@@ -11,11 +11,20 @@
       "fieldValidateRulesMinlength": "2"
     }
   ],
-  "relationships": [],
+  "relationships": [
+    {
+      "relationshipType": "many-to-many",
+      "otherEntityName": "post",
+      "otherEntityRelationshipName": "tag",
+      "relationshipName": "entry",
+      "otherEntityField": "id",
+      "ownerSide": false
+    }
+  ],
   "changelogDate": "20201117143248",
   "entityTableName": "tag",
   "dto": "no",
-  "pagination": "no",
+  "pagination": "infinite-scroll",
   "service": "no",
   "jpaMetamodelFiltering": false,
   "fluentMethods": true,

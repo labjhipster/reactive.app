@@ -1,8 +1,10 @@
 package es.lab.reactive.app.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
@@ -27,6 +29,11 @@ public class Blog implements Serializable {
     @Size(min = 2)
     @Field("handle")
     private String handle;
+
+    @DBRef
+    @Field("user")
+    @JsonIgnoreProperties(value = "blogs", allowSetters = true)
+    private User user;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -61,6 +68,19 @@ public class Blog implements Serializable {
 
     public void setHandle(String handle) {
         this.handle = handle;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Blog user(User user) {
+        this.user = user;
+        return this;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 

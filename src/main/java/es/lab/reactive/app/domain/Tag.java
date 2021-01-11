@@ -1,11 +1,15 @@
 package es.lab.reactive.app.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Tag.
@@ -22,6 +26,11 @@ public class Tag implements Serializable {
     @Size(min = 2)
     @Field("name")
     private String name;
+
+    @DBRef
+    @Field("entries")
+    @JsonIgnore
+    private Set<Post> entries = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -43,6 +52,31 @@ public class Tag implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<Post> getEntries() {
+        return entries;
+    }
+
+    public Tag entries(Set<Post> posts) {
+        this.entries = posts;
+        return this;
+    }
+
+    public Tag addEntry(Post post) {
+        this.entries.add(post);
+        post.getTags().add(this);
+        return this;
+    }
+
+    public Tag removeEntry(Post post) {
+        this.entries.remove(post);
+        post.getTags().remove(this);
+        return this;
+    }
+
+    public void setEntries(Set<Post> posts) {
+        this.entries = posts;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 

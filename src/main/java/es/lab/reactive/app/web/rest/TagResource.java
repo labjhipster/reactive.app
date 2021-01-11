@@ -5,11 +5,18 @@ import es.lab.reactive.app.repository.TagRepository;
 import es.lab.reactive.app.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
+import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.reactive.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +28,7 @@ import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,22 +101,17 @@ public class TagResource {
     /**
      * {@code GET  /tags} : get all the tags.
      *
+     * @param pageable the pagination information.
+     * @param request a {@link ServerHttpRequest} request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of tags in body.
      */
     @GetMapping("/tags")
-    public Mono<List<Tag>> getAllTags() {
-        log.debug("REST request to get all Tags");
-        return tagRepository.findAll().collectList();
-    }
-
-    /**
-     * {@code GET  /tags} : get all the tags as a stream.
-     * @return the {@link Flux} of tags.
-     */
-    @GetMapping(value = "/tags", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Flux<Tag> getAllTagsAsStream() {
-        log.debug("REST request to get all Tags as a stream");
-        return tagRepository.findAll();
+    public Mono<ResponseEntity<Flux<Tag>>> getAllTags(Pageable pageable, ServerHttpRequest request) {
+        log.debug("REST request to get a page of Tags");
+        return tagRepository.count()
+            .map(total -> new PageImpl<>(new ArrayList<>(), pageable, total))
+            .map(page -> PaginationUtil.generatePaginationHttpHeaders(UriComponentsBuilder.fromHttpRequest(request), page))
+            .map(headers -> ResponseEntity.ok().headers(headers).body(tagRepository.findAllBy(pageable)));
     }
 
     /**

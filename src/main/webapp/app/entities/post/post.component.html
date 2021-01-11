@@ -21,20 +21,26 @@
     <div class="table-responsive" id="entities" *ngIf="posts && posts.length > 0">
         <table class="table table-striped" aria-describedby="page-heading">
             <thead>
-                <tr>
-                    <th scope="col" ><span jhiTranslate="global.field.id">ID</span></th>
-                    <th scope="col" ><span jhiTranslate="reactiveApp.post.title">Title</span></th>
-                    <th scope="col" ><span jhiTranslate="reactiveApp.post.content">Content</span></th>
-                    <th scope="col" ><span jhiTranslate="reactiveApp.post.date">Date</span></th>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" [callback]="reset.bind(this)">
+                    <th scope="col"  jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="title"><span jhiTranslate="reactiveApp.post.title">Title</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="content"><span jhiTranslate="reactiveApp.post.content">Content</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="date"><span jhiTranslate="reactiveApp.post.date">Date</span> <fa-icon icon="sort"></fa-icon></th>
+                    <th scope="col"  jhiSortBy="blog.name"><span jhiTranslate="reactiveApp.post.blog">Blog</span> <fa-icon icon="sort"></fa-icon></th>
                     <th scope="col"></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
                 <tr *ngFor="let post of posts ;trackBy: trackId">
                     <td><a [routerLink]="['/post', post.id, 'view']">{{ post.id }}</a></td>
                     <td>{{ post.title }}</td>
                     <td>{{ post.content }}</td>
                     <td>{{ post.date | date:'medium' }}</td>
+                    <td>
+                        <div *ngIf="post.blog">
+                            <a [routerLink]="['/blog', post.blog?.id, 'view']" >{{ post.blog?.name }}</a>
+                        </div>
+                    </td>
                     <td class="text-right">
                         <div class="btn-group">
                             <button type="submit"

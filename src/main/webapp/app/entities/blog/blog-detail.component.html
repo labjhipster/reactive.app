@@ -16,6 +16,10 @@
                 <dd>
                     <span>{{ blog.handle }}</span>
                 </dd>
+                <dt><span jhiTranslate="reactiveApp.blog.user">User</span></dt>
+                <dd>
+                    {{ blog.user?.login }}
+                </dd>
             </dl>
 
             <button type="submit"

@@ -6,27 +6,37 @@ import es.lab.reactive.app.repository.PostRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.Base64Utils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
 
 /**
  * Integration tests for the {@link PostResource} REST controller.
  */
 @SpringBootTest(classes = ReactiveApp.class)
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureWebTestClient
 @WithMockUser
 public class PostResourceIT {
@@ -42,6 +52,9 @@ public class PostResourceIT {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Mock
+    private PostRepository postRepositoryMock;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -159,30 +172,6 @@ public class PostResourceIT {
     }
 
     @Test
-    public void getAllPostsAsStream() {
-        // Initialize the database
-        postRepository.save(post).block();
-
-        List<Post> postList = webTestClient.get().uri("/api/posts")
-            .accept(MediaType.APPLICATION_STREAM_JSON)
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_STREAM_JSON)
-            .returnResult(Post.class)
-            .getResponseBody()
-            .filter(post::equals)
-            .collectList()
-            .block(Duration.ofSeconds(5));
-
-        assertThat(postList).isNotNull();
-        assertThat(postList).hasSize(1);
-        Post testPost = postList.get(0);
-        assertThat(testPost.getTitle()).isEqualTo(DEFAULT_TITLE);
-        assertThat(testPost.getContent()).isEqualTo(DEFAULT_CONTENT);
-        assertThat(testPost.getDate()).isEqualTo(DEFAULT_DATE);
-    }
-
-    @Test
     public void getAllPosts() {
         // Initialize the database
         postRepository.save(post).block();
@@ -200,6 +189,28 @@ public class PostResourceIT {
             .jsonPath("$.[*].date").value(hasItem(DEFAULT_DATE.toString()));
     }
     
+    @SuppressWarnings({"unchecked"})
+    public void getAllPostsWithEagerRelationshipsIsEnabled() {
+        when(postRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
+
+        webTestClient.get().uri("/api/posts?eagerload=true")
+            .exchange()
+            .expectStatus().isOk();
+
+        verify(postRepositoryMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public void getAllPostsWithEagerRelationshipsIsNotEnabled() {
+        when(postRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
+
+        webTestClient.get().uri("/api/posts?eagerload=true")
+            .exchange()
+            .expectStatus().isOk();
+
+        verify(postRepositoryMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
     @Test
     public void getPost() {
         // Initialize the database

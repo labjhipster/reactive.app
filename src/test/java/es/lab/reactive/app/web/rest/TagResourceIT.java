@@ -125,28 +125,6 @@ public class TagResourceIT {
     }
 
     @Test
-    public void getAllTagsAsStream() {
-        // Initialize the database
-        tagRepository.save(tag).block();
-
-        List<Tag> tagList = webTestClient.get().uri("/api/tags")
-            .accept(MediaType.APPLICATION_STREAM_JSON)
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_STREAM_JSON)
-            .returnResult(Tag.class)
-            .getResponseBody()
-            .filter(tag::equals)
-            .collectList()
-            .block(Duration.ofSeconds(5));
-
-        assertThat(tagList).isNotNull();
-        assertThat(tagList).hasSize(1);
-        Tag testTag = tagList.get(0);
-        assertThat(testTag.getName()).isEqualTo(DEFAULT_NAME);
-    }
-
-    @Test
     public void getAllTags() {
         // Initialize the database
         tagRepository.save(tag).block();

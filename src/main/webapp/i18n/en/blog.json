@@ -17,7 +17,8 @@
         "title": "Blog"
       },
       "name": "Name",
-      "handle": "Handle"
+      "handle": "Handle",
+      "user": "User"
     }
   }
 }

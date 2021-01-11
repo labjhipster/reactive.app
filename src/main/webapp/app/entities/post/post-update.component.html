@@ -51,6 +51,21 @@
                         </small>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="reactiveApp.post.blog" for="field_blog">Blog</label>
+                    <select class="form-control" id="field_blog" name="blog" formControlName="blog">
+                        <option [ngValue]="null"></option>
+                        <option [ngValue]="blogOption.id === editForm.get('blog')!.value?.id ? editForm.get('blog')!.value : blogOption" *ngFor="let blogOption of blogs; trackBy: trackById">{{ blogOption.name }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label jhiTranslate="reactiveApp.post.tag" for="field_tags">Tag</label>
+                    <select class="form-control" id="field_tags" multiple name="tags" formControlName="tags">
+                        <option [ngValue]="getSelected(editForm.get('tags')!.value, tagOption)" *ngFor="let tagOption of tags; trackBy: trackById">{{ tagOption.name }}</option>
+                    </select>
+                </div>
             </div>
 
             <div>

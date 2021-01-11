@@ -24,11 +24,27 @@
       ]
     }
   ],
-  "relationships": [],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "blog",
+      "otherEntityRelationshipName": "post",
+      "relationshipName": "blog",
+      "otherEntityField": "name"
+    },
+    {
+      "relationshipType": "many-to-many",
+      "otherEntityName": "tag",
+      "otherEntityRelationshipName": "entry",
+      "relationshipName": "tag",
+      "otherEntityField": "name",
+      "ownerSide": true
+    }
+  ],
   "changelogDate": "20201117143148",
   "entityTableName": "post",
   "dto": "no",
-  "pagination": "no",
+  "pagination": "infinite-scroll",
   "service": "no",
   "jpaMetamodelFiltering": false,
   "fluentMethods": true,

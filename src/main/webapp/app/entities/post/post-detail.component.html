@@ -20,6 +20,18 @@
                 <dd>
                     <span>{{ post.date }}</span>
                 </dd>
+                <dt><span jhiTranslate="reactiveApp.post.blog">Blog</span></dt>
+                <dd>
+                    <div *ngIf="post.blog">
+                        <a [routerLink]="['/blog', post.blog?.id, 'view']">{{ post.blog?.name }}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="reactiveApp.post.tag">Tag</span></dt>
+                <dd>
+                    <span *ngFor="let tag of post.tags; let last = last">
+                        <a [routerLink]="['/tag', tag?.id, 'view']">{{ tag.name }}</a>{{ last ? '' : ', ' }}
+                    </span>
+                </dd>
             </dl>
 
             <button type="submit"

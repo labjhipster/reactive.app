@@ -11,6 +11,12 @@ import { JhiDataUtils, JhiFileLoadError, JhiEventManager, JhiEventWithContent } 
 import { IPost, Post } from 'app/shared/model/post.model';
 import { PostService } from './post.service';
 import { AlertError } from 'app/shared/alert/alert-error.model';
+import { IBlog } from 'app/shared/model/blog.model';
+import { BlogService } from 'app/entities/blog/blog.service';
+import { ITag } from 'app/shared/model/tag.model';
+import { TagService } from 'app/entities/tag/tag.service';
+
+type SelectableEntity = IBlog | ITag;
 
 @Component({
   selector: 'jhi-post-update',
@@ -18,18 +24,24 @@ import { AlertError } from 'app/shared/alert/alert-error.model';
 })
 export class PostUpdateComponent implements OnInit {
   isSaving = false;
+  blogs: IBlog[] = [];
+  tags: ITag[] = [];
 
   editForm = this.fb.group({
     id: [],
     title: [null, [Validators.required]],
     content: [null, [Validators.required]],
     date: [null, [Validators.required]],
+    blog: [],
+    tags: [],
   });
 
   constructor(
     protected dataUtils: JhiDataUtils,
     protected eventManager: JhiEventManager,
     protected postService: PostService,
+    protected blogService: BlogService,
+    protected tagService: TagService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}
@@ -42,6 +54,10 @@ export class PostUpdateComponent implements OnInit {
       }
 
       this.updateForm(post);
+
+      this.blogService.query().subscribe((res: HttpResponse<IBlog[]>) => (this.blogs = res.body || []));
+
+      this.tagService.query().subscribe((res: HttpResponse<ITag[]>) => (this.tags = res.body || []));
     });
   }
 
@@ -51,6 +67,8 @@ export class PostUpdateComponent implements OnInit {
       title: post.title,
       content: post.content,
       date: post.date ? post.date.format(DATE_TIME_FORMAT) : null,
+      blog: post.blog,
+      tags: post.tags,
     });
   }
 
@@ -91,6 +109,8 @@ export class PostUpdateComponent implements OnInit {
       title: this.editForm.get(['title'])!.value,
       content: this.editForm.get(['content'])!.value,
       date: this.editForm.get(['date'])!.value ? moment(this.editForm.get(['date'])!.value, DATE_TIME_FORMAT) : undefined,
+      blog: this.editForm.get(['blog'])!.value,
+      tags: this.editForm.get(['tags'])!.value,
     };
   }
 
@@ -108,5 +128,20 @@ export class PostUpdateComponent implements OnInit {
 
   protected onSaveError(): void {
     this.isSaving = false;
+  }
+
+  trackById(index: number, item: SelectableEntity): any {
+    return item.id;
+  }
+
+  getSelected(selectedVals: ITag[], option: ITag): ITag {
+    if (selectedVals) {
+      for (let i = 0; i < selectedVals.length; i++) {
+        if (option.id === selectedVals[i].id) {
+          return selectedVals[i];
+        }
+      }
+    }
+    return option;
   }
 }

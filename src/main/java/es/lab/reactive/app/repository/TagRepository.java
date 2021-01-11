@@ -1,8 +1,10 @@
 package es.lab.reactive.app.repository;
 
 import es.lab.reactive.app.domain.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 /**
  * Spring Data MongoDB reactive repository for the Tag entity.
@@ -11,5 +13,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TagRepository extends ReactiveMongoRepository<Tag, String> {
 
+
+    Flux<Tag> findAllBy(Pageable pageable);
 
 }

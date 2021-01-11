@@ -1,12 +1,16 @@
 package es.lab.reactive.app.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Post.
@@ -30,6 +34,15 @@ public class Post implements Serializable {
     @NotNull
     @Field("date")
     private Instant date;
+
+    @DBRef
+    @Field("blog")
+    @JsonIgnoreProperties(value = "posts", allowSetters = true)
+    private Blog blog;
+
+    @DBRef
+    @Field("tags")
+    private Set<Tag> tags = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -77,6 +90,44 @@ public class Post implements Serializable {
 
     public void setDate(Instant date) {
         this.date = date;
+    }
+
+    public Blog getBlog() {
+        return blog;
+    }
+
+    public Post blog(Blog blog) {
+        this.blog = blog;
+        return this;
+    }
+
+    public void setBlog(Blog blog) {
+        this.blog = blog;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public Post tags(Set<Tag> tags) {
+        this.tags = tags;
+        return this;
+    }
+
+    public Post addTag(Tag tag) {
+        this.tags.add(tag);
+        tag.getEntries().add(this);
+        return this;
+    }
+
+    public Post removeTag(Tag tag) {
+        this.tags.remove(tag);
+        tag.getEntries().remove(this);
+        return this;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 

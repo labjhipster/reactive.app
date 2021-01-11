@@ -25,6 +25,7 @@
                     <th scope="col" ><span jhiTranslate="global.field.id">ID</span></th>
                     <th scope="col" ><span jhiTranslate="reactiveApp.blog.name">Name</span></th>
                     <th scope="col" ><span jhiTranslate="reactiveApp.blog.handle">Handle</span></th>
+                    <th scope="col" ><span jhiTranslate="reactiveApp.blog.user">User</span></th>
                     <th scope="col"></th>
                 </tr>
             </thead>
@@ -33,6 +34,9 @@
                     <td><a [routerLink]="['/blog', blog.id, 'view']">{{ blog.id }}</a></td>
                     <td>{{ blog.name }}</td>
                     <td>{{ blog.handle }}</td>
+                    <td>
+                        {{ blog.user?.login }}
+                    </td>
                     <td class="text-right">
                         <div class="btn-group">
                             <button type="submit"
